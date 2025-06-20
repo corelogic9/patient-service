@@ -1,0 +1,37 @@
+name: Deploy Patient Service
+
+on:
+  push:
+    paths:
+      - 'patient-service/**'
+      - '.github/workflows/deploy-patient.yml'
+    branches: [ main ]
+
+jobs:
+  build-and-push-patient:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_ACCOUNT_ID: ${{ secrets.ECR_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $ECR_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build and Push Patient Service Docker Image
+        run: |
+          docker build -t patient-service ./patient-service
+          docker tag patient-service:latest $ECR_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/patient-service:latest
+          docker push $ECR_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/patient-service:latest
