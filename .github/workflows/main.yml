@@ -3,8 +3,6 @@ name: Deploy Patient Service
 on:
   push:
     paths:
-      - 'patient-service/**'
-      - '.github/workflows/deploy-patient.yml'
     branches: [ main ]
 
 jobs:
