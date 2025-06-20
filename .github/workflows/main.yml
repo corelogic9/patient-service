@@ -30,6 +30,6 @@ jobs:
 
       - name: Build and Push Patient Service Docker Image
         run: |
-          docker build -t patient-service ./patient-service
+          docker build -t patient-service .
           docker tag patient-service:latest $ECR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest
           docker push $ECR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest
